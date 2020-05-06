@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Redfox">
+      <HintPath>..\..\Redfox\Redfox\bin\Debug\netcoreapp3.0\Redfox.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
