@@ -51,6 +51,7 @@ namespace MorabarabaExtension
                 enqueuedUsers[0].UserVariables.Add("morabaraba_session", new UserVariable<int>("morabaraba_session", sess.id, true));
                 enqueuedUsers[1].UserVariables.Add("morabaraba_session", new UserVariable<int>("morabaraba_session", sess.id, true));
                 enqueuedUsers.RemoveRange(0, 2);
+                sess.StartGame();
             }
         }
         public static void DequeueUser(User user)

@@ -23,7 +23,8 @@ namespace MorabarabaExtension
         }
         public void StartGame()
         {
-            foreach(User user in users)
+            this.board = new MorabarabaBoard();
+            foreach (User user in users)
             {
                 user.SendMessage(new GameBeginResponse(user == users[0]));
             }
@@ -34,13 +35,15 @@ namespace MorabarabaExtension
             MorabarabaMove move = board.ParseAndValidateMove(playerid, movestr);
             if(move != null)
             {
-                if(board.MakeMove(playerid, move))
+                bool playerWon = board.MakeMove(playerid, move);
+                board.addToHistory(movestr);
+                if (playerWon)
                 {
                     //Player won
                     foreach(User target in users)
                     {
                         target.SendMessage(new GameEndResponse(target == user));
-                        user.Zone.RoomManager.GetRoom("lobby").Join(user);
+                        user.Zone.RoomManager.GetRoom("lobby").Join(target);
                     }
                 }
                 return true;

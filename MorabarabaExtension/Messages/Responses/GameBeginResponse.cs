@@ -7,7 +7,7 @@ namespace MorabarabaExtension.Messages.Responses
 {
     class GameBeginResponse : IZoneResponseMessage
     {
-        bool isYourTurn;
+        public bool isYourTurn;
         public GameBeginResponse(bool _isYourTurn) : base("si#gb")
         {
             this.isYourTurn = _isYourTurn;

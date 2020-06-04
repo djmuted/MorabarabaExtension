@@ -26,9 +26,10 @@ namespace MorabarabaExtension.Messages.Requests
             if (sess.MakeMove(user, move))
             {
                 //move is possible and the board has been updated
-                user.Room?.SendMessage(new PlayerMoveResponse(move));
+                user.Room?.SendMessage(new PlayerMoveResponse(move, sess.users.IndexOf(user)));
             } else
             {
+                Console.WriteLine("Invalid move attempted! " + move);
                 //TODO: invalid move
                 //notify the user or just ignore?
             }
