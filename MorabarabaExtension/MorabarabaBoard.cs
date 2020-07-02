@@ -268,7 +268,29 @@ namespace MorabarabaExtension
                             {
                                 if (isPotentialMill(this.fields[shotspl[0]], playerid)) //does the placed cow form a mill?
                                 {
+                                    bool canPlaceShoot = false;
                                     if (!isPotentialMill(this.fields[shotspl[1]], GetEnemyId(playerid))) //make sure that the enemy cow is not a part of a mill
+                                    {
+                                        canPlaceShoot = true;
+                                    }
+                                    else
+                                    {
+                                        //check if all enemy cows are in mills
+                                        var enemyId = GetEnemyId(playerid);
+                                        canPlaceShoot = true;
+                                        foreach (var boardField in this.fields.Values)
+                                        {
+                                            if (boardField.value == enemyId)
+                                            {
+                                                if (!isPotentialMill(boardField, enemyId))
+                                                {
+                                                    canPlaceShoot = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (canPlaceShoot)
                                     {
                                         MorabarabaMove moveObj = new MorabarabaMove();
                                         moveObj.moveType = MoveType.PLACESHOOT;
@@ -297,7 +319,29 @@ namespace MorabarabaExtension
                             {
                                 if (isPotentialMill(this.fields[moveFields[1]], playerid))//does the placed cow form a mill?
                                 {
+                                    bool canMoveShoot = false;
                                     if (!isPotentialMill(this.fields[shotspl[1]], GetEnemyId(playerid)))//make sure that the enemy cow is not a part of a mill
+                                    {
+                                        canMoveShoot = true;
+                                    }
+                                    else
+                                    {
+                                        //check if all enemy cows are in mills
+                                        var enemyId = GetEnemyId(playerid);
+                                        canMoveShoot = true;
+                                        foreach (var boardField in this.fields.Values)
+                                        {
+                                            if (boardField.value == enemyId)
+                                            {
+                                                if (!isPotentialMill(boardField, enemyId))
+                                                {
+                                                    canMoveShoot = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (canMoveShoot)
                                     {
                                         MorabarabaMove moveObj = new MorabarabaMove();
                                         moveObj.moveType = MoveType.MOVESHOOT;
