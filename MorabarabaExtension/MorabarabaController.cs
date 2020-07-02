@@ -81,5 +81,21 @@ namespace MorabarabaExtension
                 gameSessions.Remove(sessid);
             }
         }
+        public static void EndGame(User user)
+        {
+            if (user.UserVariables.ContainsKey("morabaraba_session"))
+            {
+                int sessid = (user.UserVariables["morabaraba_session"] as UserVariable<int>).Value;
+                GameSession sess = gameSessions[sessid];
+                foreach (User gameuser in sess.users)
+                {
+                    gameuser.SendMessage(new GameEndResponse(gameuser == user));
+                    gameuser.Zone.RoomManager.GetRoom("lobby").Join(gameuser);
+                    gameuser.UserVariables.Remove("morabaraba_session");
+                }
+                user.Zone.RoomManager.RemoveRoom(sess.room);
+                gameSessions.Remove(sessid);
+            }
+        }
     }
 }

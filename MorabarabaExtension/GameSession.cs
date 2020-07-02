@@ -1,9 +1,7 @@
 ﻿using MorabarabaExtension.Messages.Responses;
 using Redfox.Rooms;
 using Redfox.Users;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MorabarabaExtension
 {
@@ -33,21 +31,18 @@ namespace MorabarabaExtension
         {
             int playerid = this.users.IndexOf(user);
             MorabarabaMove move = board.ParseAndValidateMove(playerid, movestr);
-            if(move != null)
+            if (move != null)
             {
                 bool playerWon = board.MakeMove(playerid, move);
                 board.addToHistory(movestr);
                 if (playerWon)
                 {
                     //Player won
-                    foreach(User target in users)
-                    {
-                        target.SendMessage(new GameEndResponse(target == user));
-                        user.Zone.RoomManager.GetRoom("lobby").Join(target);
-                    }
+                    MorabarabaController.EndGame(user);
                 }
                 return true;
-            } else
+            }
+            else
             {
                 return false;
             }
