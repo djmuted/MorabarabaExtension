@@ -206,6 +206,32 @@ namespace MorabarabaExtension
                 //Player won
                 return true;
             }
+            if (this.playerContexts[enemyid].phase == MorabarabaPhase.MOVING)
+            {
+                bool enemyHasNowhereToMove = true;
+                foreach (var boardField in this.fields.Values)
+                {
+                    if (boardField.value == enemyid)
+                    {
+                        foreach (var kvp in this.fieldGraphMatrix)
+                        {
+                            if (kvp.Key.Contains(boardField.name) && kvp.Value)
+                            {
+                                var adjField = this.fields[kvp.Key.Replace(boardField.name, "")];
+                                if (adjField.value == -1)
+                                {
+                                    enemyHasNowhereToMove = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (enemyHasNowhereToMove)
+                {
+                    return true;
+                }
+            }
             return false;
         }
         public MorabarabaMove ParseAndValidateMove(int playerid, string move)
