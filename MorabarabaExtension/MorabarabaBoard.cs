@@ -1,7 +1,4 @@
-﻿using Redfox.Users;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MorabarabaExtension
 {
@@ -29,7 +26,7 @@ namespace MorabarabaExtension
             this.fieldGraphMatrix = new Dictionary<string, bool>();
             var fieldlist = new string[] { "a7", "d7", "g7", "b6", "d6", "f6", "c5", "d5", "e5", "a4", "b4", "c4", "e4", "f4", "g4", "c3", "d3", "e3", "b2", "d2", "f2", "a1", "d1", "g1" };
 
-            foreach(var fieldname in fieldlist)
+            foreach (var fieldname in fieldlist)
             {
                 this.fields.Add(fieldname, new MorabarabaField(fieldname));
                 foreach (var fieldname2 in fieldlist)
@@ -161,7 +158,7 @@ namespace MorabarabaExtension
             {
                 move.destination.value = playerid;
             }
-            else if(move.moveType == MoveType.MOVE)
+            else if (move.moveType == MoveType.MOVE)
             {
                 move.source.value = -1;
                 move.destination.value = playerid;
@@ -176,12 +173,12 @@ namespace MorabarabaExtension
                 move.source.value = -1;
                 move.destination.value = playerid;
                 move.target.value = -1;
-                
+
             }
-            if(move.moveType == MoveType.PLACE || move.moveType == MoveType.PLACESHOOT)
+            if (move.moveType == MoveType.PLACE || move.moveType == MoveType.PLACESHOOT)
             {
                 this.playerContexts[playerid].placingCowsLeft--;
-                if(this.playerContexts[playerid].placingCowsLeft == 0)
+                if (this.playerContexts[playerid].placingCowsLeft == 0)
                 {
                     this.playerContexts[playerid].phase = MorabarabaPhase.MOVING;
                 }
@@ -199,11 +196,12 @@ namespace MorabarabaExtension
             if (this.turn == 0)
             {
                 this.turn = 1;
-            } else
+            }
+            else
             {
                 this.turn = 0;
             }
-            if(this.playerContexts[enemyid].cows == 0 && this.playerContexts[enemyid].placingCowsLeft == 0)
+            if (this.playerContexts[enemyid].cows <= 2 && this.playerContexts[enemyid].placingCowsLeft == 0)
             {
                 //Player won
                 return true;
@@ -214,7 +212,7 @@ namespace MorabarabaExtension
         {
             if (playerid < 0 || playerid > 1) return null; //invalid player id
             if (turn != playerid) return null; //not player's turn
-            if(move.Length == 2)
+            if (move.Length == 2)
             {
                 //Place a cow (no shooting)
                 if (this.playerContexts[playerid].phase == MorabarabaPhase.PLACING)
@@ -233,8 +231,8 @@ namespace MorabarabaExtension
                         }
                     }
                 }
-            } 
-            else if(move.Length == 5 && move.Contains('-'))
+            }
+            else if (move.Length == 5 && move.Contains('-'))
             {
                 //Move a cow (no shooting)
                 if (this.playerContexts[playerid].phase == MorabarabaPhase.MOVING || this.playerContexts[playerid].phase == MorabarabaPhase.FLYING)
@@ -255,33 +253,36 @@ namespace MorabarabaExtension
                         }
                     }
                 }
-            } 
-            else if(move.Length == 5 && move.Contains('x'))
+            }
+            else if (move.Length == 5 && move.Contains('x'))
             {
                 //Place a cow and shoot
                 if (this.playerContexts[playerid].phase == MorabarabaPhase.PLACING)
                 {
                     if (this.playerContexts[playerid].placingCowsLeft > 0)
-                    { 
+                    {
                         var shotspl = move.Split('x');
                         if (this.fields.ContainsKey(shotspl[0]) && this.fields.ContainsKey(shotspl[1]))
                         {
                             if (this.fields[shotspl[0]].value == -1 && this.fields[shotspl[1]].value != playerid && this.fields[shotspl[1]].value != -1)
                             {
-                                if (isPotentialMill(this.fields[shotspl[0]], playerid))
+                                if (isPotentialMill(this.fields[shotspl[0]], playerid)) //does the placed cow form a mill?
                                 {
-                                    MorabarabaMove moveObj = new MorabarabaMove();
-                                    moveObj.moveType = MoveType.PLACESHOOT;
-                                    moveObj.destination = this.fields[shotspl[0]];
-                                    moveObj.target = this.fields[shotspl[1]];
-                                    return moveObj;
+                                    if (!isPotentialMill(this.fields[shotspl[1]], GetEnemyId(playerid))) //make sure that the enemy cow is not a part of a mill
+                                    {
+                                        MorabarabaMove moveObj = new MorabarabaMove();
+                                        moveObj.moveType = MoveType.PLACESHOOT;
+                                        moveObj.destination = this.fields[shotspl[0]];
+                                        moveObj.target = this.fields[shotspl[1]];
+                                        return moveObj;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            } 
-            else if(move.Length == 8 && move.Contains('-') && move.Contains('x'))
+            }
+            else if (move.Length == 8 && move.Contains('-') && move.Contains('x'))
             {
                 //Move a cow and shoot
                 if (this.playerContexts[playerid].phase == MorabarabaPhase.MOVING || this.playerContexts[playerid].phase == MorabarabaPhase.FLYING)
@@ -294,14 +295,17 @@ namespace MorabarabaExtension
                         {
                             if (this.fieldGraphMatrix[sortFieldnames(moveFields[0], moveFields[1])] || this.playerContexts[playerid].phase == MorabarabaPhase.FLYING) //are the fields connected?
                             {
-                                if (isPotentialMill(this.fields[moveFields[1]], playerid))
+                                if (isPotentialMill(this.fields[moveFields[1]], playerid))//does the placed cow form a mill?
                                 {
-                                    MorabarabaMove moveObj = new MorabarabaMove();
-                                    moveObj.moveType = MoveType.MOVESHOOT;
-                                    moveObj.source = this.fields[moveFields[0]];
-                                    moveObj.destination = this.fields[moveFields[1]];
-                                    moveObj.target = this.fields[shotspl[1]];
-                                    return moveObj;
+                                    if (!isPotentialMill(this.fields[shotspl[1]], GetEnemyId(playerid)))//make sure that the enemy cow is not a part of a mill
+                                    {
+                                        MorabarabaMove moveObj = new MorabarabaMove();
+                                        moveObj.moveType = MoveType.MOVESHOOT;
+                                        moveObj.source = this.fields[moveFields[0]];
+                                        moveObj.destination = this.fields[moveFields[1]];
+                                        moveObj.target = this.fields[shotspl[1]];
+                                        return moveObj;
+                                    }
                                 }
                             }
                         }
@@ -323,12 +327,12 @@ namespace MorabarabaExtension
         }
         public bool isPotentialMill(MorabarabaField field, int playerid)
         {
-            foreach(var millCombo in this.millCombos)
+            foreach (var millCombo in this.millCombos)
             {
                 if (!new List<string>(millCombo).Contains(field.name))
                     continue;
                 bool comboMet = true;
-                foreach(string fieldName in millCombo)
+                foreach (string fieldName in millCombo)
                 {
                     if (fieldName == field.name) continue;
                     if (fields[fieldName].value != playerid)

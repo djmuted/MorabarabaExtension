@@ -1,11 +1,10 @@
-﻿using Redfox.Configs;
+﻿using MorabarabaExtension.Messages.Responses;
+using Redfox.Configs;
 using Redfox.Rooms;
 using Redfox.Users;
 using Redfox.Users.UserVariables;
 using Redfox.Zones;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MorabarabaExtension
 {
@@ -17,9 +16,9 @@ namespace MorabarabaExtension
         public static int GetLowestFreeSessionID()
         {
             int lastid = -1;
-            foreach(int key in gameSessions.Keys)
+            foreach (int key in gameSessions.Keys)
             {
-                if(key != lastid + 1)
+                if (key != lastid + 1)
                 {
                     return lastid + 1;
                 }
@@ -31,7 +30,7 @@ namespace MorabarabaExtension
         {
             RoomConfig cfg = new RoomConfig();
             int sessid = GetLowestFreeSessionID();
-            cfg.room_name = "morabaraba_" +sessid;
+            cfg.room_name = "morabaraba_" + sessid;
             cfg.max_users = 2;
             Room gameroom = new Room(cfg);
             zone.RoomManager.AddRoom(gameroom);
@@ -43,7 +42,7 @@ namespace MorabarabaExtension
         {
             if (enqueuedUsers.Contains(user)) return;
             enqueuedUsers.Add(user);
-            if(enqueuedUsers.Count >= 2)
+            if (enqueuedUsers.Count >= 2)
             {
                 var sess = CreateGameSession(enqueuedUsers[0].Zone, enqueuedUsers[0], enqueuedUsers[1]);
                 sess.room.Join(enqueuedUsers[0]);
@@ -61,17 +60,19 @@ namespace MorabarabaExtension
         }
         public static void LeaveSession(User user)
         {
-            if(user.UserVariables.ContainsKey("morabaraba_session"))
+            if (user.UserVariables.ContainsKey("morabaraba_session"))
             {
                 int sessid = (user.UserVariables["morabaraba_session"] as UserVariable<int>).Value;
                 GameSession sess = gameSessions[sessid];
-                foreach(User gameuser in sess.users)
+                foreach (User gameuser in sess.users)
                 {
                     if (gameuser == user)
                     {
                         sess.room.Leave(gameuser);
-                    } else
+                    }
+                    else
                     {
+                        gameuser.SendMessage(new GameEndResponse(true));
                         gameuser.Zone.RoomManager.GetRoom("lobby").Join(gameuser);
                     }
                     gameuser.UserVariables.Remove("morabaraba_session");

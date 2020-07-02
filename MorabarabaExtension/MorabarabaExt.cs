@@ -3,7 +3,6 @@ using Redfox.Extensions;
 using Redfox.Rooms;
 using Redfox.Users;
 using Redfox.Zones;
-using System;
 
 namespace MorabarabaExtension
 {
@@ -29,7 +28,6 @@ namespace MorabarabaExtension
         }
         private void OnRoomLeave(User user, Room room)
         {
-
         }
     }
 }
